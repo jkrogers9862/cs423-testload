@@ -1,0 +1,96 @@
+//
+// File:	wavefrontloader.h
+// Author:      adam.lewis@athens.edu
+// Purpose:
+// Load the geometry information from a Wavefront OBJ 3-d model into an
+// OpenGL program.  This code is based upon tutorial code from James Maples
+// (http://http://www.tutorialized.com/tutorial/Write-a-WaveFront-OpenGL-3D-object-loader-in-C)
+// and is licensed under a CC BY-NC-SA license.
+//
+#ifndef _WAVEFRONT_LOADER_H_
+#define _WAVEFRONT_LOADER_H_
+
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <cstring>
+#include <string>
+using namespace std;
+
+#include <GL/gl.h>
+
+
+typedef struct
+{
+float x;
+float y;
+float z;
+}
+  Vector;
+
+typedef struct
+{
+float r;
+float g;
+float b;
+}
+  Colour;
+
+typedef struct
+{
+int v1, v2, v3;
+int vn1, vn2, vn3;
+int vt1, vt2, vt3;
+}
+  Face;
+
+typedef struct
+{
+float u, v;
+}
+  TexCoord;
+
+typedef struct
+{
+float Ka[3];
+float Kd[3];
+float Ks[3];
+float Ns;				// Specular (coeff)
+}
+  Material;
+
+class WFObject
+{
+private:
+// Dynamic variables to keep our object data in
+vector<Vector> vertices;
+vector<Vector> normals;
+// Vector of vectors because each material has a group of verticies
+vector< vector<Face> > faces;
+vector<TexCoord> texCoords;
+vector<Material> materials;
+// Stores the material file. This is so the file doesn't have to be re-
+vector<string> mtlFile;
+// read all the time for each material
+
+// Index of current material being used for the verticies _et al_ succeeding the `usemtl` line
+int materialIndex;
+
+void parseLine(char *line);
+
+void parseVertex(char *line);
+void parseNormal(char *line);
+void parseFace(char *line);
+
+int loadMaterials(char *filename);
+void parseMaterial(string line);
+
+public:
+WFObject();
+~WFObject();
+
+int load(char *filename);
+void draw();
+};
+
+#endif
